@@ -7,7 +7,6 @@ from mpltools import style
 
 style.use('ggplot')
 
-sys.path.append('/home/markus/git/plotter')
 import hdf5_gen
 
 class GUIForm(QtGui.QDialog):
@@ -51,7 +50,6 @@ class GUIForm(QtGui.QDialog):
         self.ui.widget1.canvas.ax.scatter(MA_X_16S, MA_Y_16S, alpha=0.5, c=data_dic["data1"][subunitc[index4]], linewidths=( 0, 0, 0), picker=True)
         self.ui.widget1.canvas.fig.tight_layout()
         self.ui.widget1.canvas.draw()
-        self.ui.widget1.canvas.mpl_connect('pick_event', lambda event: onpick(event, data_dic, index4, index1, index2))
 
         self.ui.widget2.canvas.ax.clear()
         self.ui.widget2.canvas.ax.set_ylabel('Read Counts', fontsize=14)
@@ -62,7 +60,6 @@ class GUIForm(QtGui.QDialog):
             self.ui.widget2.canvas.ax.scatter(data_nt[nucl_data[index4]], [-1 * data for data in data_nt[subunit_neg[index4 ]]], alpha=0.5, c=data_nt[subunitc[index4]], linewidths=( 0, 0, 0), picker=True, marker = data_nt['symbol'])
         self.ui.widget2.canvas.fig.tight_layout()
         self.ui.widget2.canvas.draw()
-        self.ui.widget2.canvas.mpl_connect('pick_event', lambda event: onpick(event, data_dic, index4, index1, index2))
 
 
 if __name__ == "__main__":

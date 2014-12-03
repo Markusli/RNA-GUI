@@ -2,6 +2,7 @@ from PyQt4 import QtCore, QtGui
 import numpy as np
 from matplotlibwidget import maplot, scatter
 from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
+import hdf5_gen
 
 
 try:
@@ -30,18 +31,22 @@ class Ui_MainWindow(QtGui.QWidget):
         self.widget1 = maplot(self.centralwidget)
         self.widget1.setObjectName(_fromUtf8("MA plot"))
         self.toolbar1 = NavigationToolbar(self.widget1.canvas, self)
+        self.widget1.canvas.mpl_connect('pick_event', lambda event: self.onpick(event))
+
 
         self.widget2 = scatter(self.centralwidget)
         self.widget2.setObjectName(_fromUtf8("Scatter"))
-        self.toolbar2 = NavigationToolbar(self.widget1.canvas, self)
+        self.toolbar2 = NavigationToolbar(self.widget2.canvas, self)
+        self.widget2.canvas.mpl_connect('pick_event', lambda event: self.onpick(event))
+
 
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
         self.combo1 = QtGui.QComboBox(self.centralwidget)
-        self.combo1.addItems('MazF2h none,MazF2h PNK,MazF2h TAP,MqsR2h none,MqsR2h PNK,MqsR2h TAP,MG1655log none,MG1655log PNK, MG1655log TAP,delta3 none,delta3 PNK,delta3 TAP'.split(','))
+        self.combo1.addItems('MazF2h none,MazF2h PNK,MazF2h TAP,MqsR2h none,MqsR2h PNK,MqsR2h TAP,MG1655log none,MG1655log PNK,MG1655log TAP,delta3 none,delta3 PNK,delta3 TAP'.split(','))
 
         self.combo2 = QtGui.QComboBox(self.centralwidget)
-        self.combo2.addItems('MazF2h none,MazF2h PNK,MazF2h TAP,MqsR2h none,MqsR2h PNK,MqsR2h TAP,MG1655log none,MG1655log PNK, MG1655log TAP,delta3 none,delta3 PNK,delta3 TAP'.split(','))
+        self.combo2.addItems('MazF2h none,MazF2h PNK,MazF2h TAP,MqsR2h none,MqsR2h PNK,MqsR2h TAP,MG1655log none,MG1655log PNK,MG1655log TAP,delta3 none,delta3 PNK,delta3 TAP'.split(','))
 
         self.combo3 = QtGui.QComboBox(self.centralwidget)
         self.combo3.addItems('5prime,3primeok,3primeshady'.split(','))
@@ -50,7 +55,7 @@ class Ui_MainWindow(QtGui.QWidget):
         self.combo4 = QtGui.QComboBox(self.centralwidget)
         self.combo4.addItems('16S,23S'.split(','))
 
-        self.text = QtGui.QTextEdit(self.centralwidget)
+        self.text = QtGui.QPlainTextEdit(self.centralwidget)
         self.text.setMaximumSize(400,400)
         self.clearButton = QtGui.QPushButton(self.centralwidget)
         self.clearButton.setObjectName(_fromUtf8("clearButton"))
@@ -94,7 +99,7 @@ class Ui_MainWindow(QtGui.QWidget):
         self.clearButton.setText(_translate("MainWindow", "Clear Text", None))
 
     def on_combo_prime_change(self, index):
-        items_5 = 'MazF2h none,MazF2h PNK,MazF2h TAP,MqsR2h none,MqsR2h PNK,MqsR2h TAP,MG1655log none,MG1655log PNK, MG1655log TAP,delta3 none,delta3 PNK,delta3 TAP'
+        items_5 = 'MazF2h none,MazF2h PNK,MazF2h TAP,MqsR2h none,MqsR2h PNK,MqsR2h TAP,MG1655log none,MG1655log PNK,MG1655log TAP,delta3 none,delta3 PNK,delta3 TAP'
         items_3 = 'MazF2h PNK-,MazF2h PNK+,MqsR2h PNK-,MqsR2h PNK+,MG1655log PNK-,MG1655log PNK+'
         text = self.combo3.currentText()
         if text == '5prime':
@@ -108,6 +113,38 @@ class Ui_MainWindow(QtGui.QWidget):
             self.combo1.clear()
             self.combo1.addItems(items_3.split(','))
 
+    def onpick(self, event):
+
+        index1 = self.combo1.currentText()
+        index2 = self.combo2.currentText()
+        index3 = self.combo3.currentText()
+        index4 = self.combo4.currentIndex()
+        index1 = str(index1).split(' ')
+        index2 = str(index2).split(' ')
+        index3 = str(index3)
+        data_dic = hdf5_gen.get_hdf_data([index3, index3], [index1[0], index2[0]],[index1[1], index2[1]],['_input_', 'some'])
+
+        #Gets the index of datapoint (index of X and Y)
+        ind = event.ind
+
+        subunit = ['y_pos_16S', 'y_pos_23S']
+        nucl_data = ['nucl_data_16S', 'nucl_data_23S']
+        subunit_neg = ['y_neg_16S', 'y_neg_23S']
+        #Retrieves information from lists based on index of the datapoint.
+        #The information to be displayed for datapoint has the same index as datapint.
+
+        nucleotide_pos = np.take(data_dic['data1'][nucl_data[index4]], ind)
+        sample_1_pos_read_count = np.take(data_dic['data1'][subunit[index4]], ind)
+        sample_2_pos_read_count = np.take(data_dic['data2'][subunit[index4]], ind)
+        sample_1_neg_read_count = np.take(data_dic['data1'][subunit_neg[index4]], ind)
+        sample_2_neg_read_count = np.take(data_dic['data2'][subunit_neg[index4]], ind)
+
+        for array_ind in range(len(nucleotide_pos)):
+            print ("Nucleotide position: {0} \n{5} pos: {1}\n{6} pos {2}\
+                            \n{5} neg: {3}\n{6} neg {4}".format(nucleotide_pos[array_ind], sample_1_pos_read_count[array_ind],
+                                                             sample_2_pos_read_count[array_ind], sample_1_neg_read_count[array_ind],
+                                                             sample_2_neg_read_count[array_ind], ' '.join(index1), ' '.join(index2)))
+
 class OutLog:
     def __init__(self, edit, out=None, color=None):
 
@@ -120,7 +157,7 @@ class OutLog:
             tc = self.edit.textColor()
             self.edit.setTextColor(self.color)
 
-        self.edit.moveCursor(QtGui.QTextCursor.End)
+        self.edit.moveCursor(QtGui.QTextCursor.Start)
         self.edit.insertPlainText( m )
 
         if self.color:
@@ -132,29 +169,8 @@ class OutLog:
 
 
 
-def onpick(event, data_dic, index4, index1, index2):
-
-    #Gets the index of datapoint (index of X and Y)
-    ind = event.ind
-
-    subunit = ['y_pos_16S', 'y_pos_23S']
-    nucl_data = ['nucl_data_16S', 'nucl_data_23S']
-    subunit_neg = ['y_neg_16S', 'y_neg_23S']
-    #Retrieves information from lists based on index of the datapoint.
-    #The information to be displayed for datapoint has the same index as datapint.
-
-    nucleotide_pos = np.take(data_dic['data1'][nucl_data[index4]], ind)
-    sample_1_pos_read_count = np.take(data_dic['data1'][subunit[index4]], ind)
-    sample_2_pos_read_count = np.take(data_dic['data2'][subunit[index4]], ind)
-    sample_1_neg_read_count = np.take(data_dic['data1'][subunit_neg[index4]], ind)
-    sample_2_neg_read_count = np.take(data_dic['data2'][subunit_neg[index4]], ind)
-
-    for array_ind in range(len(nucleotide_pos)):
-        print ("Nucleotide position: {0} \n{5} pos: {1}\n{6} pos {2}\
-                        \n{5} neg: {3}\n{6} neg {4}".format(nucleotide_pos[array_ind], sample_1_pos_read_count[array_ind],
-                                                         sample_2_pos_read_count[array_ind], sample_1_neg_read_count[array_ind],
-                                                         sample_2_neg_read_count[array_ind], ' '.join(index1), ' '.join(index2)))
 
 
 
-
+def testing(x):
+    print x
