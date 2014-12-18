@@ -50,10 +50,9 @@ class GUIForm(QtGui.QDialog):
         self.ui.widget1.canvas.ax.set_ylabel('M', fontsize=20)
         self.ui.widget1.canvas.ax.set_xlabel('A', fontsize=20)
         self.ui.widget1.canvas.ax.scatter(MA_X_16S, MA_Y_16S, alpha=0.5, c=data_dic["data1"][subunitc[index4]], linewidths=( 0, 0, 0), picker=True)
-        self.ui.widget1.canvas.fig.tight_layout()
+        #self.ui.widget1.canvas.fig.tight_layout()
         self.ui.widget1.canvas.draw()
 
-        print index5
         if index5 == 0:
             self.ui.widget2.canvas.ax.clear()
             hundred_1 = 0
@@ -61,6 +60,7 @@ class GUIForm(QtGui.QDialog):
             for i in range(-2,3):
                 index = data_dic['data1'][nucl_data[index4]].index(float(i))
                 hundred_1 += data_dic['data1'][subunit[index4]][index]
+                print hundred_1
                 hundred_2 += data_dic['data2'][subunit[index4]][index]
             heights_1 = [(x / hundred_1 * 100) for x in data_dic['data1'][subunit[index4]]]
             heights_2 = [(x / hundred_2 * 100) for x in data_dic['data2'][subunit[index4]]]
@@ -69,7 +69,7 @@ class GUIForm(QtGui.QDialog):
             self.ui.widget2.canvas.ax.set_xlabel('Nucleotide Position', fontsize=14)
             self.ui.widget2.canvas.ax.set_title(plotname[index4], fontsize=14)
             self.ui.widget2.canvas.ax.scatter(data_dic['data1'][nucl_data[index4]], heights, alpha=0.5, c=data_dic['data1'][subunitc[index4]], linewidths=( 0, 0, 0), picker=True, marker = data_dic['data1']['symbol'])
-            self.ui.widget2.canvas.fig.tight_layout()
+            #self.ui.widget2.canvas.fig.tight_layout()
             self.ui.widget2.canvas.draw()
 
         elif index5 == 1:

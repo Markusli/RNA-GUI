@@ -104,7 +104,7 @@ class Ui_MainWindow(QtGui.QWidget):
 
     def on_combo_prime_change(self, index):
         items_5 = 'MazF2h none,MazF2h PNK,MazF2h TAP,MqsR2h none,MqsR2h PNK,MqsR2h TAP,MG1655log none,MG1655log PNK,MG1655log TAP,delta3 none,delta3 PNK,delta3 TAP'
-        items_3 = 'MazF2h PNK-,MazF2h PNK+,MqsR2h PNK-,MqsR2h PNK+,MG1655log PNK-,MG1655log PNK+'
+        items_3 = 'MazF2h PNK-,MazF2h PNK+,MqsR2h PNK-,MqsR2h PNK+,MG1655log PNK-,MG1655log PNK+,delta3 PNK-,delta3 PNK+'
         text = self.combo3.currentText()
         if text == '5prime':
             self.combo2.clear()
