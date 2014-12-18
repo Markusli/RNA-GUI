@@ -1,11 +1,12 @@
 import sys
+import matplotlib
+matplotlib.use("Qt4Agg")
 from matplot import *
-import random
 import math
 from PyQt4 import QtCore, QtGui
-from mpltools import style
+import matplotlib.pyplot as plt
 
-style.use('ggplot')
+plt.style.use('ggplot')
 
 import hdf5_gen
 
@@ -29,6 +30,7 @@ class GUIForm(QtGui.QDialog):
         index2 = self.ui.combo2.currentText()
         index3 = self.ui.combo3.currentText()
         index4 = self.ui.combo4.currentIndex()
+        index5 = self.ui.combo5.currentIndex()
         index1 = str(index1).split(' ')
         index2 = str(index2).split(' ')
         index3 = str(index3)
@@ -51,15 +53,35 @@ class GUIForm(QtGui.QDialog):
         self.ui.widget1.canvas.fig.tight_layout()
         self.ui.widget1.canvas.draw()
 
-        self.ui.widget2.canvas.ax.clear()
-        self.ui.widget2.canvas.ax.set_ylabel('Read Counts', fontsize=14)
-        self.ui.widget2.canvas.ax.set_xlabel('Nucleotide Position', fontsize=14)
-        self.ui.widget2.canvas.ax.set_title(plotname[index4], fontsize=14)
-        for data_key, data_nt in data_dic.items():
-            self.ui.widget2.canvas.ax.scatter(data_nt[nucl_data[index4]], data_nt[subunit[index4]], alpha=0.5, c=data_nt[subunitc[index4]], linewidths=( 0, 0, 0), picker=True, marker = data_nt['symbol'])
-            self.ui.widget2.canvas.ax.scatter(data_nt[nucl_data[index4]], [-1 * data for data in data_nt[subunit_neg[index4 ]]], alpha=0.5, c=data_nt[subunitc[index4]], linewidths=( 0, 0, 0), picker=True, marker = data_nt['symbol'])
-        self.ui.widget2.canvas.fig.tight_layout()
-        self.ui.widget2.canvas.draw()
+        print index5
+        if index5 == 0:
+            self.ui.widget2.canvas.ax.clear()
+            hundred_1 = 0
+            hundred_2 = 0
+            for i in range(-2,3):
+                index = data_dic['data1'][nucl_data[index4]].index(float(i))
+                hundred_1 += data_dic['data1'][subunit[index4]][index]
+                hundred_2 += data_dic['data2'][subunit[index4]][index]
+            heights_1 = [(x / hundred_1 * 100) for x in data_dic['data1'][subunit[index4]]]
+            heights_2 = [(x / hundred_2 * 100) for x in data_dic['data2'][subunit[index4]]]
+            heights = [x - y for x, y in zip(heights_1, heights_2)] # alumine miinus ylemine, ehk yleval nullproov, all toodeldd
+            self.ui.widget2.canvas.ax.set_ylabel('Relative percentage of reads', fontsize=14)
+            self.ui.widget2.canvas.ax.set_xlabel('Nucleotide Position', fontsize=14)
+            self.ui.widget2.canvas.ax.set_title(plotname[index4], fontsize=14)
+            self.ui.widget2.canvas.ax.scatter(data_dic['data1'][nucl_data[index4]], heights, alpha=0.5, c=data_dic['data1'][subunitc[index4]], linewidths=( 0, 0, 0), picker=True, marker = data_dic['data1']['symbol'])
+            self.ui.widget2.canvas.fig.tight_layout()
+            self.ui.widget2.canvas.draw()
+
+        elif index5 == 1:
+            self.ui.widget2.canvas.ax.clear()
+            self.ui.widget2.canvas.ax.set_ylabel('Read Counts', fontsize=14)
+            self.ui.widget2.canvas.ax.set_xlabel('Nucleotide Position', fontsize=14)
+            self.ui.widget2.canvas.ax.set_title(plotname[index4], fontsize=14)
+            for data_key, data_nt in data_dic.items():
+                self.ui.widget2.canvas.ax.scatter(data_nt[nucl_data[index4]], data_nt[subunit[index4]], alpha=0.5, c=data_nt[subunitc[index4]], linewidths=( 0, 0, 0), picker=True, marker = data_nt['symbol'])
+                self.ui.widget2.canvas.ax.scatter(data_nt[nucl_data[index4]], [-1 * data for data in data_nt[subunit_neg[index4 ]]], alpha=0.5, c=data_nt[subunitc[index4]], linewidths=( 0, 0, 0), picker=True, marker = data_nt['symbol'])
+            self.ui.widget2.canvas.fig.tight_layout()
+            self.ui.widget2.canvas.draw()
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 from PyQt4 import QtCore, QtGui
 import numpy as np
 from matplotlibwidget import maplot, scatter
-from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
+from matplotlib.backends.backend_qt4agg import NavigationToolbar2QT as NavigationToolbar
 import hdf5_gen
 
 
@@ -43,20 +43,23 @@ class Ui_MainWindow(QtGui.QWidget):
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
         self.combo1 = QtGui.QComboBox(self.centralwidget)
-        self.combo1.addItems('MazF2h none,MazF2h PNK,MazF2h TAP,MqsR2h none,MqsR2h PNK,MqsR2h TAP,MG1655log none,MG1655log PNK,MG1655log TAP,delta3 none,delta3 PNK,delta3 TAP'.split(','))
+        self.combo1.addItems('MazF2h none,MazF2h PNK,MazF2h TAP,MqsR2h none,MqsR2h PNK,MqsR2h TAP,MG1655log none,MG1655log PNK,MG1655log TAP,MG1655stats none,MG1655stats PNK,MG1655stats TAP,delta3 none,delta3 PNK,delta3 TAP'.split(','))
 
         self.combo2 = QtGui.QComboBox(self.centralwidget)
-        self.combo2.addItems('MazF2h none,MazF2h PNK,MazF2h TAP,MqsR2h none,MqsR2h PNK,MqsR2h TAP,MG1655log none,MG1655log PNK,MG1655log TAP,delta3 none,delta3 PNK,delta3 TAP'.split(','))
+        self.combo2.addItems('MazF2h none,MazF2h PNK,MazF2h TAP,MqsR2h none,MqsR2h PNK,MqsR2h TAP,MG1655log none,MG1655log PNK,MG1655log TAP,MG1655stats none,MG1655stats PNK,MG1655stats TAP,delta3 none,delta3 PNK,delta3 TAP'.split(','))
 
         self.combo3 = QtGui.QComboBox(self.centralwidget)
-        self.combo3.addItems('5prime,3primeok,3primeshady'.split(','))
+        self.combo3.addItems('5prime,3prime'.split(','))
         self.combo3.currentIndexChanged[str].connect(self.on_combo_prime_change)
 
         self.combo4 = QtGui.QComboBox(self.centralwidget)
         self.combo4.addItems('16S,23S'.split(','))
 
+        self.combo5 = QtGui.QComboBox(self.centralwidget)
+        self.combo5.addItems('Percentages,Absolute values'.split(','))
+
         self.text = QtGui.QPlainTextEdit(self.centralwidget)
-        self.text.setMaximumSize(400,400)
+        self.text.setMaximumWidth(400)
         self.clearButton = QtGui.QPushButton(self.centralwidget)
         self.clearButton.setObjectName(_fromUtf8("clearButton"))
         self.retranslateUi(MainWindow)
@@ -77,6 +80,7 @@ class Ui_MainWindow(QtGui.QWidget):
         cbbox.addWidget(self.combo2)
         cbbox.addWidget(self.combo3)
         cbbox.addWidget(self.combo4)
+        cbbox.addWidget(self.combo5)
 
         bbox = QtGui.QVBoxLayout()
         bbox.addLayout(cbbox)
@@ -172,5 +176,3 @@ class OutLog:
 
 
 
-def testing(x):
-    print x
