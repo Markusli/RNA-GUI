@@ -28,6 +28,7 @@ class Ui_MainWindow(QtGui.QWidget):
         self.plotButton = QtGui.QPushButton(self.centralwidget)
         self.plotButton.setObjectName(_fromUtf8("plotButton"))
 
+
         self.widget1 = maplot(self.centralwidget)
         self.widget1.setObjectName(_fromUtf8("MA plot"))
         self.toolbar1 = NavigationToolbar(self.widget1.canvas, self)
@@ -103,6 +104,8 @@ class Ui_MainWindow(QtGui.QWidget):
         self.clearButton.setText(_translate("MainWindow", "Clear Text", None))
 
     def on_combo_prime_change(self, index):
+        self.combo5.setEnabled(False)
+        self.combo5.setCurrentIndex(1)
         items_5 = 'MazF2h none,MazF2h PNK,MazF2h TAP,MqsR2h none,MqsR2h PNK,MqsR2h TAP,MG1655log none,MG1655log PNK,MG1655log TAP,delta3 none,delta3 PNK,delta3 TAP'
         items_3 = 'MazF2h PNK-,MazF2h PNK+,MqsR2h PNK-,MqsR2h PNK+,MG1655log PNK-,MG1655log PNK+,delta3 PNK-,delta3 PNK+'
         text = self.combo3.currentText()
@@ -123,31 +126,67 @@ class Ui_MainWindow(QtGui.QWidget):
         index2 = self.combo2.currentText()
         index3 = self.combo3.currentText()
         index4 = self.combo4.currentIndex()
+        index5 = self.combo5.currentIndex()
         index1 = str(index1).split(' ')
         index2 = str(index2).split(' ')
         index3 = str(index3)
         data_dic = hdf5_gen.get_hdf_data([index3, index3], [index1[0], index2[0]],[index1[1], index2[1]],['_input_', 'some'])
 
-        #Gets the index of datapoint (index of X and Y)
-        ind = event.ind
-
         subunit = ['y_pos_16S', 'y_pos_23S']
         nucl_data = ['nucl_data_16S', 'nucl_data_23S']
         subunit_neg = ['y_neg_16S', 'y_neg_23S']
+
+        #Gets the index of datapoint (index of X and Y)
+        ind = event.ind
+
         #Retrieves information from lists based on index of the datapoint.
         #The information to be displayed for datapoint has the same index as datapint.
 
-        nucleotide_pos = np.take(data_dic['data1'][nucl_data[index4]], ind)
-        sample_1_pos_read_count = np.take(data_dic['data1'][subunit[index4]], ind)
-        sample_2_pos_read_count = np.take(data_dic['data2'][subunit[index4]], ind)
-        sample_1_neg_read_count = np.take(data_dic['data1'][subunit_neg[index4]], ind)
-        sample_2_neg_read_count = np.take(data_dic['data2'][subunit_neg[index4]], ind)
+        if index5 == 1:
+            nucleotide_pos = np.take(data_dic['data1'][nucl_data[index4]], ind)
+            sample_1_pos_read_count = np.take(data_dic['data1'][subunit[index4]], ind)
+            sample_2_pos_read_count = np.take(data_dic['data2'][subunit[index4]], ind)
+            sample_1_neg_read_count = np.take(data_dic['data1'][subunit_neg[index4]], ind)
+            sample_2_neg_read_count = np.take(data_dic['data2'][subunit_neg[index4]], ind)
 
-        for array_ind in range(len(nucleotide_pos)):
-            print ("Nucleotide position: {0} \n{5} pos: {1}\n{6} pos {2}\
-                            \n{5} neg: {3}\n{6} neg {4}".format(nucleotide_pos[array_ind], sample_1_pos_read_count[array_ind],
-                                                             sample_2_pos_read_count[array_ind], sample_1_neg_read_count[array_ind],
-                                                             sample_2_neg_read_count[array_ind], ' '.join(index1), ' '.join(index2)))
+            for array_ind in range(len(nucleotide_pos)):
+                print ("Nucleotide position: {0} \n{5} pos: {1}\n{6} pos {2}\
+                                \n{5} neg: {3}\n{6} neg {4}\n=======================".format(nucleotide_pos[array_ind], sample_1_pos_read_count[array_ind],
+                                                                 sample_2_pos_read_count[array_ind], sample_1_neg_read_count[array_ind],
+                                                                 sample_2_neg_read_count[array_ind], ' '.join(index1), ' '.join(index2)))
+
+        elif index5 == 0:
+
+            hundred_1 = 0
+            hundred_2 = 0
+            for i in range(-19,22):
+                index = data_dic['data1'][nucl_data[index4]].index(float(i))
+                hundred_1 += data_dic['data1'][subunit[index4]][index]
+                hundred_2 += data_dic['data2'][subunit[index4]][index]
+            heights_1 = [(x / hundred_1 * 100) for x in data_dic['data1'][subunit[index4]]]
+            heights_2 = [(x / hundred_2 * 100) for x in data_dic['data2'][subunit[index4]]]
+            #Gets the index of datapoint (index of X and Y)
+            ind = event.ind
+
+
+            #Retrieves information from lists based on index of the datapoint.
+            #The information to be displayed for datapoint has the same index as datapint.
+
+            nucleotide_pos = np.take(data_dic['data1'][nucl_data[index4]], ind)
+            sample_1_pos_read_count = np.take(heights_1, ind)
+            sample_2_pos_read_count = np.take(heights_2, ind)
+            sample_1_pos_abs_count = np.take(data_dic['data1'][subunit[index4]], ind)
+            sample_2_pos_abs_count = np.take(data_dic['data2'][subunit[index4]], ind)
+            #sample_1_neg_read_count = np.take(data_dic['data1'][subunit_neg[index4]], ind)
+            #sample_2_neg_read_count = np.take(data_dic['data2'][subunit_neg[index4]], ind)
+
+            for array_ind in range(len(nucleotide_pos)):
+                print ("Nucleotide position: {0}\nPercentages:\n{3}: {1}\n{4}: {2}\nAbsolute values:\n{3}: {5}\n{4}: {6}\n======================="\
+                    .format(int(nucleotide_pos[array_ind]), round(sample_1_pos_read_count[array_ind],4),
+                                                                 round(sample_2_pos_read_count[array_ind], 4), ' '.join(index1), ' '.join(index2),
+                                                                 int(sample_1_pos_abs_count[array_ind]),int(sample_2_pos_abs_count[array_ind])))
+
+
 
 class OutLog:
     def __init__(self, edit, out=None, color=None):
