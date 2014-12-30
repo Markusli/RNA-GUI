@@ -18,14 +18,18 @@ class GUIForm(QtGui.QDialog):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        sys.stdout = OutLog(self.ui.text, sys.stdout)
-        sys.stderr = OutLog(self.ui.text, sys.stderr, QtGui.QColor(255,0,0) )
-
         QtCore.QObject.connect(self.ui.plotButton, QtCore.SIGNAL('clicked()'), self.PlotFunc)
         QtCore.QObject.connect(self.ui.clearButton, QtCore.SIGNAL('clicked()'), self.ui.text.clear)
 
 
     def PlotFunc(self):
+
+        name_conv = {'MazF': 'MazF2h',
+            'MqsR': 'MqsR2h',
+            'Log': 'MG1655log',
+            'Stat': 'MG1655stats',
+            'Delta3': 'delta3'}
+
         index1 = self.ui.combo1.currentText()
         index2 = self.ui.combo2.currentText()
         index3 = self.ui.combo3.currentText()
@@ -35,7 +39,7 @@ class GUIForm(QtGui.QDialog):
         index2 = str(index2).split(' ')
         index3 = str(index3)
 
-        data_dic = hdf5_gen.get_hdf_data([index3, index3], [index1[0], index2[0]],[index1[1], index2[1]],['_input_', 'some'])
+        data_dic = hdf5_gen.get_hdf_data([index3, index3], [name_conv[index1[0]], name_conv[index2[0]]],[index1[1], index2[1]],['_input_', 'some'])
 
 
         subunit = ['y_pos_16S', 'y_pos_23S']
@@ -55,7 +59,6 @@ class GUIForm(QtGui.QDialog):
                 c = 'black'
             colors.append(c)
         self.ui.widget1.canvas.ax.scatter(MA_X_16S, MA_Y_16S, alpha=0.5, c=colors, linewidths=( 0, 0, 0), picker=True)
-        #self.ui.widget1.canvas.fig.tight_layout()
         self.ui.widget1.canvas.draw()
 
         if index5 == 0:
@@ -74,7 +77,6 @@ class GUIForm(QtGui.QDialog):
             self.ui.widget2.canvas.ax.set_title(plotname[index4], fontsize=14)
             self.ui.widget2.canvas.ax.scatter(data_dic['data1'][nucl_data[index4]], heights_1, alpha=0.5, c=data_dic['data1'][subunitc[index4]], linewidths=( 0, 0, 0), picker=True, marker = data_dic['data1']['symbol'])
             self.ui.widget2.canvas.ax.scatter(data_dic['data1'][nucl_data[index4]], heights_2, alpha=0.5, c=data_dic['data2'][subunitc[index4]], linewidths=( 0, 0, 0), picker=True, marker = data_dic['data2']['symbol'])
-            #self.ui.widget2.canvas.fig.tight_layout()
             self.ui.widget2.canvas.ax.set_ylim(-20,max(heights_1 + heights_2) + 10)
             self.ui.widget2.canvas.draw()
 
