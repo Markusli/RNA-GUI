@@ -43,3 +43,5 @@ class scatter(QtGui.QWidget):
         self.vbl.addWidget(self.canvas)
         self.setLayout(self.vbl)
         #self.canvas.fig.tight_layout()
+
+
