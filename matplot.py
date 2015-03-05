@@ -25,7 +25,7 @@ except AttributeError:
 
 
 
-items3prime = 'MazF PNK-,MazF PNK+,MqsR PNK-,MqsR PNK+,Log PNK-,Log PNK+,Stat PNK-,Stat PNK+,Delta3 PNK-,Delta3 PNK+'
+items3prime = 'MazF none,MazF PNK,MqsR none,MqsR PNK,Log none,Log PNK,Stat none,Stat PNK,Delta3 none,Delta3 PNK'#'MazF PNK-,MazF PNK+,MqsR PNK-,MqsR PNK+,Log PNK-,Log PNK+,Stat PNK-,Stat PNK+,Delta3 PNK-,Delta3 PNK+'
 items5prime = 'MazF none,MazF PNK,MazF TAP,MqsR none,MqsR PNK,MqsR TAP,Log none,Log PNK,Log TAP,Stat none,Stat PNK,Stat TAP,Delta3 none,Delta3 PNK,Delta3 TAP'
 
 # Setting up the whole interface
@@ -112,7 +112,9 @@ class Plotter(QtGui.QWidget):
                     'MqsR': 'MqsR2h',
                     'Log': 'MG1655log',
                     'Stat': 'MG1655stats',
-                    'Delta3': 'delta3'}
+                    'Delta3': 'delta3',
+                    'none': 'PNK-',
+                    'PNK': 'PNK+'}
 
         proc1 = self.proc1combo.currentText()
         proc2 = self.proc2combo.currentText()
@@ -123,7 +125,10 @@ class Plotter(QtGui.QWidget):
         proc2 = str(proc2).split(' ')
         prim_select = str(prim_select)
 
-        data_dic = hdf5_gen.get_hdf_data([prim_select, prim_select], [name_conv[proc1[0]], name_conv[proc2[0]]],[proc1[1], proc2[1]],['_input_', 'some'])
+        if prim_select == '5prime':
+            data_dic = hdf5_gen.get_hdf_data([prim_select, prim_select], [name_conv[proc1[0]], name_conv[proc2[0]]],[proc1[1], proc2[1]],['_input_', 'some'])
+        else:
+            data_dic = hdf5_gen.get_hdf_data([prim_select, prim_select], [name_conv[proc1[0]], name_conv[proc2[0]]],[name_conv[proc1[1]], name_conv[proc2[1]]],['_input_', 'some'])
         colors = []
         for i in range(len(data_dic["data1"][subunitc[sub_select]])):
             c = data_dic["data1"][subunitc[sub_select]][i]
