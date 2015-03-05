@@ -20,14 +20,19 @@ def get_hdf_data(primes, dataset_names,processing_names,_input_):
                         if i == 2:
                             if x == 'b':
                                 x = 'y'
-                            if x == 'r':
-                                x = 'c'
                         if i == 3:
                             if x == 'b':
                                 x = 'g'
-                            if x == 'r':
-                                x = 'c'
                         data.append(x)
+                if 'symbol' in name:
+                    if i == 0:
+                        data='o'
+                    if i == 1:
+                        data='D'
+                    if i == 2:
+                        data='s'
+                    if i == 3:
+                        data='^'
                 else:
                     data = np.array(data).tolist()
                 data_dic[compatibility_naming[i]][name] = data

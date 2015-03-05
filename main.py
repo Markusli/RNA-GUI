@@ -63,11 +63,11 @@ class Ui_MainWindow(QtGui.QWidget):
     def setupUi(self, MainWindow):
         self.plotter = Plotter()
         self.plotter.setupUi()
-        self.compare = Compare()
-        self.compare.setupUi()
+        #self.compare = Compare()
+        #self.compare.setupUi()
         self.stackedLayout = QtGui.QStackedLayout()
         self.stackedLayout.addWidget(self.plotter)
-        self.stackedLayout.addWidget(self.compare)
+        #self.stackedLayout.addWidget(self.compare)
         self.stackedLayout.setCurrentIndex(0)
 
         mainLayout = QtGui.QVBoxLayout()
