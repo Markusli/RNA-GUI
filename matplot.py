@@ -103,6 +103,7 @@ class Plotter(QtGui.QWidget):
         global data_dic
 
         subunit = ['y_pos_16S', 'y_pos_23S']
+        subunit_MA = ['MA_y_pos_16S', 'MA_y_pos_23S']
         subunitc = ['colour_16S', 'colour_23S']
         nucl_data = ['nucl_data_16S', 'nucl_data_23S']
         subunit_neg = ['y_neg_16S', 'y_neg_23S']
@@ -138,15 +139,15 @@ class Plotter(QtGui.QWidget):
                 colors.append(c)
 
 
-        MA_X_16S = [(math.log(float(y1), 2) + math.log(float(y2), 2))/2 for y1, y2 in zip(data_dic['data1'][subunit[sub_select]], data_dic['data2'][subunit[sub_select]])]
-        MA_Y_16S = [math.log((float(y1)/y2), 2) for y1, y2 in zip(data_dic['data1'][subunit[sub_select]], data_dic['data2'][subunit[sub_select]])]
+        MA_X_16S = [(math.log(float(y1), 2) + math.log(float(y2), 2))/2 for y1, y2 in zip(data_dic['data1'][subunit_MA[sub_select]], data_dic['data2'][subunit_MA[sub_select]])]
+        MA_Y_16S = [math.log((float(y1)/y2), 2) for y1, y2 in zip(data_dic['data1'][subunit_MA[sub_select]], data_dic['data2'][subunit_MA[sub_select]])]
         self.widget1.canvas.ax.clear()
         self.widget1.canvas.ax.set_ylabel('M', fontsize=20)
         self.widget1.canvas.ax.set_xlabel('A', fontsize=20)
         series1 = self.widget1.canvas.ax.scatter(MA_X_16S, MA_Y_16S, alpha=0.5, c=colors, linewidths=( 0, 0, 0), picker=True, label='Datapoints')
         self.widget1.canvas.ax.set_ylim(min(MA_Y_16S)-2,max(MA_Y_16S) + 2)
         mazf = self.widget1.canvas.ax.scatter(0,min(MA_Y_16S)-200, alpha=0.5, c='red', marker = 'o', label = 'MazF')
-        mqsr = self.widget1.canvas.ax.scatter(0,min(MA_Y_16S)-200, alpha=0.5, c='magenta', marker = 'o', label = 'MqsR')
+        mqsr = self.widget1.canvas.ax.scatter(0,min(MA_Y_16S)-200, alpha=0.5, c='cyan', marker = 'o', label = 'MqsR')
         self.widget1.canvas.ax.legend(handles=[series1,mazf,mqsr],loc='best', scatterpoints = 1)
         self.widget1.canvas.draw()
 
@@ -169,7 +170,7 @@ class Plotter(QtGui.QWidget):
                                                      picker=True, marker = data_dic['data2']['symbol'], label=' '.join(proc2), linewidth='1')
             self.widget2.canvas.ax.set_ylim(-20,max(heights_1 + heights_2) + 10)
             mazf = self.widget2.canvas.ax.scatter(0,-1000, alpha=0.5, c='red', marker = 'o', label = 'MazF')
-            mqsr = self.widget2.canvas.ax.scatter(0,-1000, alpha=0.5, c='magenta', marker = 'o', label = 'MqsR')
+            mqsr = self.widget2.canvas.ax.scatter(0,-1000, alpha=0.5, c='cyan', marker = 'o', label = 'MqsR')
             self.widget2.canvas.ax.legend(handles=[series1, series2, mazf, mqsr],loc='best', scatterpoints = 1)
             self.widget2.canvas.draw()
 
@@ -190,7 +191,7 @@ class Plotter(QtGui.QWidget):
             max_height = max(data_dic['data1'][subunit[sub_select]] + data_dic['data2'][subunit[sub_select]])
             self.widget2.canvas.ax.set_ylim(-0.2*max_height,max_height)
             mazf = self.widget2.canvas.ax.scatter(0,-0.3*max_height, alpha=0.5, c='red', marker = 'o', label = 'MazF')
-            mqsr = self.widget2.canvas.ax.scatter(0,-0.3*max_height, alpha=0.5, c='magenta', marker = 'o', label = 'MqsR')
+            mqsr = self.widget2.canvas.ax.scatter(0,-0.3*max_height, alpha=0.5, c='cyan', marker = 'o', label = 'MqsR')
             self.widget2.canvas.ax.legend(handles=[series1, series2, mazf, mqsr],loc='best', scatterpoints = 1)
             self.widget2.canvas.draw()
 
