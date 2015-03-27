@@ -58,6 +58,8 @@ class GUIForm(QtGui.QMainWindow):
         else:
             self.ui.compare.save()
 
+
+# Used to enable stacked window layout. Turnet out not to be necessary at the moment.
 class Ui_MainWindow(QtGui.QWidget):
 
     def setupUi(self, MainWindow):

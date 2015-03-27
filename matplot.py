@@ -247,11 +247,12 @@ class Plotter(QtGui.QWidget):
             sample_2_neg_read_count = np.take(data_dic['data2'][subunit_neg[sub_select]], ind)
 
             for array_ind in range(len(nucleotide_pos)):
-                position = int(nucleotide_pos[array_ind]) + 19
+                position = int(nucleotide_pos[array_ind]) + 114
                 if prim_select == '5prime':
                     sequence = str(fasta[position-3:position]+ '_' + '<b>' + fasta[position] + '</b>' + fasta[position+1:position+4])
                 else:
-                    sequence = str(fasta[position-4:position-1] + '<b>' + fasta[position-1] + '</b>' + '_' + fasta[position:position+3])
+                    sequence = str(fasta[position-3:position] + '<b>' + fasta[position] + '</b>' + '_' + fasta[position+1:position+4])
+                sequence = ("").join([x if x != 'T' else 'U'for x in sequence ])
                 message = "Primary sequence:<br>{7}<br>Nucleotide position: {0:,} <br>{5} '+' strand: {1:,}<br>{6} '+' strand {2:,}\
                                 <br>{5} '-' strand: {3:,}<br>{6} '-' strand {4:,}<br>=======================<br>"\
                                 .format(int(nucleotide_pos[array_ind]),
@@ -286,7 +287,7 @@ class Plotter(QtGui.QWidget):
             sample_2_pos_abs_count = np.take(data_dic['data2'][subunit[sub_select]], ind)
 
             for array_ind in range(len(nucleotide_pos)):
-                position = int(nucleotide_pos[array_ind]) + 19
+                position = int(nucleotide_pos[array_ind]) + 114
                 if prim_select == '5prime':
                     print
                     if fasta[position:position+3] in ['ACA','GCU']:
@@ -301,6 +302,7 @@ class Plotter(QtGui.QWidget):
                     else:
                         threeprimeside = fasta[position+1:position+4]
                     sequence = str(fasta[position-4:position-1]+ '_' + '<b>' + fasta[position-1] + '</b>' + '_' + fasta[position:position+3])
+                sequence = ("").join([x if x != 'T' else 'U'for x in sequence ])
                 message = "Primary sequence:<br>{7}<br>Nucleotide position: {0:,}<br>Percentages:<br>{3}: {1}<br>{4}:\
                             {2}<br>Absolute values:<br>{3}: {5:,}<br>{4}: {6:,}<br>=======================<br>"\
                             .format(int(nucleotide_pos[array_ind]),
@@ -314,6 +316,7 @@ class Plotter(QtGui.QWidget):
                 self.text.insertHtml(message)
                 self.text.moveCursor(QtGui.QTextCursor.Start)
 
+# Enables saving data from the plotter program. Not developed for the moment as there is no need for it.
     def save(self):
 
         proc1 = self.proc1combo.currentText()
