@@ -146,9 +146,10 @@ class Plotter(QtGui.QWidget):
         self.widget1.canvas.ax.set_xlabel('A', fontsize=20)
         series1 = self.widget1.canvas.ax.scatter(MA_X_16S, MA_Y_16S, alpha=0.5, c=colors, linewidths=( 0, 0, 0), picker=True, label='Datapoints')
         self.widget1.canvas.ax.set_ylim(min(MA_Y_16S)-2,max(MA_Y_16S) + 2)
+        ser1 = self.widget1.canvas.ax.scatter(0,min(MA_Y_16S)-200, alpha=0.5, c='black', marker = 'o', label = 'Datapoints')
         mazf = self.widget1.canvas.ax.scatter(0,min(MA_Y_16S)-200, alpha=0.5, c='red', marker = 'o', label = 'MazF')
         mqsr = self.widget1.canvas.ax.scatter(0,min(MA_Y_16S)-200, alpha=0.5, c='cyan', marker = 'o', label = 'MqsR')
-        self.widget1.canvas.ax.legend(handles=[series1,mazf,mqsr],loc='best', scatterpoints = 1)
+        self.widget1.canvas.ax.legend(handles=[ser1,mazf,mqsr],loc='best', scatterpoints = 1)
         self.widget1.canvas.draw()
 
         if value_select == 0:
@@ -169,9 +170,11 @@ class Plotter(QtGui.QWidget):
             series2 = self.widget2.canvas.ax.scatter(data_dic['data1'][nucl_data[sub_select]], heights_2, alpha=0.5, facecolors=data_dic['data2'][subunitc[sub_select]],
                                                      picker=True, marker = data_dic['data2']['symbol'], label=' '.join(proc2), linewidth='1')
             self.widget2.canvas.ax.set_ylim(-20,max(heights_1 + heights_2) + 10)
+            ser1 = self.widget2.canvas.ax.scatter(0,-1000, alpha=0.5, c='blue', marker = 'o', label = ' '.join(proc1))
+            ser2 = self.widget2.canvas.ax.scatter(0,-1000, alpha=0.5, c='green', marker = 'D', label = ' '.join(proc2))
             mazf = self.widget2.canvas.ax.scatter(0,-1000, alpha=0.5, c='red', marker = 'o', label = 'MazF')
             mqsr = self.widget2.canvas.ax.scatter(0,-1000, alpha=0.5, c='cyan', marker = 'o', label = 'MqsR')
-            self.widget2.canvas.ax.legend(handles=[series1, series2, mazf, mqsr],loc='best', scatterpoints = 1)
+            self.widget2.canvas.ax.legend(handles=[ser1, ser2, mazf, mqsr],loc='best', scatterpoints = 1)
             self.widget2.canvas.draw()
 
         elif value_select == 1:
@@ -190,9 +193,11 @@ class Plotter(QtGui.QWidget):
             self.widget2.canvas.fig.tight_layout()
             max_height = max(data_dic['data1'][subunit[sub_select]] + data_dic['data2'][subunit[sub_select]])
             self.widget2.canvas.ax.set_ylim(-0.2*max_height,max_height)
-            mazf = self.widget2.canvas.ax.scatter(0,-0.3*max_height, alpha=0.5, c='red', marker = 'o', label = 'MazF')
-            mqsr = self.widget2.canvas.ax.scatter(0,-0.3*max_height, alpha=0.5, c='cyan', marker = 'o', label = 'MqsR')
-            self.widget2.canvas.ax.legend(handles=[series1, series2, mazf, mqsr],loc='best', scatterpoints = 1)
+            ser1 = self.widget2.canvas.ax.scatter(0,-1000, alpha=0.5, c='blue', marker = 'o', label = ' '.join(proc1))
+            ser2 = self.widget2.canvas.ax.scatter(0,-1000, alpha=0.5, c='green', marker = 'D', label = ' '.join(proc2))
+            mazf = self.widget2.canvas.ax.scatter(0,-1000, alpha=0.5, c='red', marker = 'o', label = 'MazF')
+            mqsr = self.widget2.canvas.ax.scatter(0,-1000, alpha=0.5, c='cyan', marker = 'o', label = 'MqsR')
+            self.widget2.canvas.ax.legend(handles=[ser1, ser2, mazf, mqsr],loc='best', scatterpoints = 1)
             self.widget2.canvas.draw()
 
     def on_combo_prime_change(self, index):
@@ -247,7 +252,11 @@ class Plotter(QtGui.QWidget):
             sample_2_neg_read_count = np.take(data_dic['data2'][subunit_neg[sub_select]], ind)
 
             for array_ind in range(len(nucleotide_pos)):
-                position = int(nucleotide_pos[array_ind]) + 114
+                if sub_select == 0:
+                    position = int(nucleotide_pos[array_ind]) + 114
+                else:
+                    position = int(nucleotide_pos[array_ind]) + 19
+                
                 if prim_select == '5prime':
                     sequence = str(fasta[position-3:position]+ '_' + '<b>' + fasta[position] + '</b>' + fasta[position+1:position+4])
                 else:
@@ -287,21 +296,14 @@ class Plotter(QtGui.QWidget):
             sample_2_pos_abs_count = np.take(data_dic['data2'][subunit[sub_select]], ind)
 
             for array_ind in range(len(nucleotide_pos)):
-                position = int(nucleotide_pos[array_ind]) + 114
-                if prim_select == '5prime':
-                    print
-                    if fasta[position:position+3] in ['ACA','GCU']:
-                        threeprimeside = '<i>' + fasta[position+1:position+4] +'<\i>'
-                    else:
-                        threeprimeside = fasta[position+1:position+4]
-
-                    sequence = str(fasta[position-3:position]+ '_' + '<b>' + fasta[position] + '</b>' + threeprimeside)
+                if sub_select == 0:
+                    position = int(nucleotide_pos[array_ind]) + 114
                 else:
-                    if fasta[position+1:position+4] in ['ACA','GCU']:
-                        threeprimeside = '<i>' + fasta[position+1:position+4] +'<\i>'
-                    else:
-                        threeprimeside = fasta[position+1:position+4]
-                    sequence = str(fasta[position-4:position-1]+ '_' + '<b>' + fasta[position-1] + '</b>' + '_' + fasta[position:position+3])
+                    position = int(nucleotide_pos[array_ind]) + 19
+                if prim_select == '5prime':
+                    sequence = str(fasta[position-3:position]+ '_' + '<b>' + fasta[position] + '</b>' + fasta[position+1:position+4])
+                else:
+                    sequence = str(fasta[position-3:position] + '<b>' + fasta[position] + '</b>' + '_' + fasta[position+1:position+4])
                 sequence = ("").join([x if x != 'T' else 'U'for x in sequence ])
                 message = "Primary sequence:<br>{7}<br>Nucleotide position: {0:,}<br>Percentages:<br>{3}: {1}<br>{4}:\
                             {2}<br>Absolute values:<br>{3}: {5:,}<br>{4}: {6:,}<br>=======================<br>"\
