@@ -32,6 +32,8 @@ class maplot(QtGui.QWidget):
         self.vbl = QtGui.QVBoxLayout()
         self.vbl.addWidget(self.canvas)
         self.setLayout(self.vbl)
+        self.canvas.fig.subplots_adjust(bottom=0.2)
+
 
 
 class scatter(QtGui.QWidget):
@@ -42,6 +44,6 @@ class scatter(QtGui.QWidget):
         self.vbl = QtGui.QVBoxLayout()
         self.vbl.addWidget(self.canvas)
         self.setLayout(self.vbl)
-        #self.canvas.fig.tight_layout()
+        self.canvas.fig.subplots_adjust(bottom=0.16)
 
 

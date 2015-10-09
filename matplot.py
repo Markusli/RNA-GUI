@@ -25,8 +25,8 @@ except AttributeError:
 
 
 
-items3prime = 'MazF none,MazF PNK,MqsR none,MqsR PNK,Log none,Log PNK,Stat none,Stat PNK,Delta3 none,Delta3 PNK'#'MazF PNK-,MazF PNK+,MqsR PNK-,MqsR PNK+,Log PNK-,Log PNK+,Stat PNK-,Stat PNK+,Delta3 PNK-,Delta3 PNK+'
-items5prime = 'MazF none,MazF PNK,MazF TAP,MqsR none,MqsR PNK,MqsR TAP,Log none,Log PNK,Log TAP,Stat none,Stat PNK,Stat TAP,Delta3 none,Delta3 PNK,Delta3 TAP'
+items3prime = 'MazF none,MazF PNK,MqsR none,MqsR PNK,Log none,Log PNK,Stat none,Stat PNK,stat_exo- none,stat_exo- PNK'#'MazF PNK-,MazF PNK+,MqsR PNK-,MqsR PNK+,Log PNK-,Log PNK+,Stat PNK-,Stat PNK+,stat_exo- PNK-,stat_exo- PNK+'
+items5prime = 'MazF none,MazF PNK,MazF TAP,MqsR none,MqsR PNK,MqsR TAP,Log none,Log PNK,Log TAP,Stat none,Stat PNK,Stat TAP,stat_exo- none,stat_exo- PNK,stat_exo- TAP'
 
 # Setting up the whole interface
 class Plotter(QtGui.QWidget):
@@ -58,7 +58,7 @@ class Plotter(QtGui.QWidget):
         self.subcombo.addItems('16S,23S'.split(','))
 
         self.valcombo = QtGui.QComboBox(self)
-        self.valcombo.addItems('Percentages,Absolute values'.split(','))
+        self.valcombo.addItems('Relative,Absolute values'.split(','))
 
         self.text = QtGui.QTextEdit(self)
         self.text.setMaximumWidth(400)
@@ -97,7 +97,8 @@ class Plotter(QtGui.QWidget):
 
     data_dic = {}
 
-    # Function that retrieves the data from HDF5 file and plots it to the canvas. All choices regarding what and how is displayed is done at the start of this function
+    #=====================================================================================================
+    # Function that retrieves data from HDF according to the selected parameters and draws requested plots
     def PlotFunc(self):
 
         global data_dic
@@ -109,11 +110,13 @@ class Plotter(QtGui.QWidget):
         subunit_neg = ['y_neg_16S', 'y_neg_23S']
         plotname = ['16S Scatterplot', '23S Scatterplot']
 
+        #================================================================================
+        # Name conversion to compensate for different labels in the cboxes and in the hdf
         name_conv = {'MazF': 'MazF2h',
                     'MqsR': 'MqsR2h',
                     'Log': 'MG1655log',
                     'Stat': 'MG1655stats',
-                    'Delta3': 'delta3',
+                    'stat_exo-': 'delta3',
                     'none': 'PNK-',
                     'PNK': 'PNK+'}
 
@@ -126,6 +129,8 @@ class Plotter(QtGui.QWidget):
         proc2 = str(proc2).split(' ')
         prim_select = str(prim_select)
 
+        #===============================================================
+        # Retrieving data from HDF. Changing colors for both processings
         if prim_select == '5prime':
             data_dic = hdf5_gen.get_hdf_data([prim_select, prim_select], [name_conv[proc1[0]], name_conv[proc2[0]]],[proc1[1], proc2[1]],['_input_', 'some'])
         else:
@@ -138,7 +143,8 @@ class Plotter(QtGui.QWidget):
             else:
                 colors.append(c)
 
-
+        #===============================================================
+        # Drawing the MA plot
         MA_X_16S = [(math.log(float(y1), 2) + math.log(float(y2), 2))/2 for y1, y2 in zip(data_dic['data1'][subunit_MA[sub_select]], data_dic['data2'][subunit_MA[sub_select]])]
         MA_Y_16S = [math.log((float(y1)/y2), 2) for y1, y2 in zip(data_dic['data1'][subunit_MA[sub_select]], data_dic['data2'][subunit_MA[sub_select]])]
         self.widget1.canvas.ax.clear()
@@ -146,39 +152,60 @@ class Plotter(QtGui.QWidget):
         self.widget1.canvas.ax.set_xlabel('A', fontsize=20)
         series1 = self.widget1.canvas.ax.scatter(MA_X_16S, MA_Y_16S, alpha=0.5, c=colors, linewidths=( 0, 0, 0), picker=True, label='Datapoints')
         self.widget1.canvas.ax.set_ylim(min(MA_Y_16S)-2,max(MA_Y_16S) + 2)
-        mazf = self.widget1.canvas.ax.scatter(0,min(MA_Y_16S)-200, alpha=0.5, c='red', marker = 'o', label = 'MazF')
-        mqsr = self.widget1.canvas.ax.scatter(0,min(MA_Y_16S)-200, alpha=0.5, c='cyan', marker = 'o', label = 'MqsR')
+        mazf = self.widget1.canvas.ax.scatter(0,min(MA_Y_16S)-200, alpha=0.5, c='red', marker = 'o', label = ' _ACA')
+        mqsr = self.widget1.canvas.ax.scatter(0,min(MA_Y_16S)-200, alpha=0.5, c='cyan', marker = 'o', label = 'G_CB')
         self.widget1.canvas.ax.legend(handles=[series1,mazf,mqsr],loc='best', scatterpoints = 1)
         self.widget1.canvas.draw()
 
+        #===============================================================
+        # Drawing the erlative and absolute graphs. Value_select 0 - relative, 1 - absolute
         if value_select == 0:
             self.widget2.canvas.ax.clear()
             hundred_1 = 0
             hundred_2 = 0
-            for i in range(-19,22):
-                index = data_dic['data1'][nucl_data[sub_select]].index(float(i))
-                hundred_1 += data_dic['data1'][subunit[sub_select]][index]
-                hundred_2 += data_dic['data2'][subunit[sub_select]][index]
+            #===============================================================
+            # Selection of locations for 100% for 5-prim and 3-prim
+
+            if prim_select == '5prime':
+                if sub_select == 0:
+                    area=range(-6,7)
+                else:
+                    area=range(0,14)
+                for i in area:
+                    index = data_dic['data1'][nucl_data[sub_select]].index(float(i))
+                    hundred_1 += data_dic['data1'][subunit[sub_select]][index]
+                    hundred_2 += data_dic['data2'][subunit[sub_select]][index]
+            elif prim_select == '3prime':
+                if sub_select == 0:
+                    area=range(1541,1550)
+                else:
+                    area=range(2901,2906)
+                for i in area:
+                    index = data_dic['data1'][nucl_data[sub_select]].index(float(i))
+                    hundred_1 += data_dic['data1'][subunit[sub_select]][index]
+                    hundred_2 += data_dic['data2'][subunit[sub_select]][index]
+
             heights_1 = [(x / hundred_1 * 100) for x in data_dic['data1'][subunit[sub_select]]]
             heights_2 = [(x / hundred_2 * 100) for x in data_dic['data2'][subunit[sub_select]]]
-            self.widget2.canvas.ax.set_ylabel('Relative percentage of reads', fontsize=14)
-            self.widget2.canvas.ax.set_xlabel('Nucleotide Position', fontsize=14)
-            self.widget2.canvas.ax.set_title(plotname[sub_select], fontsize=14)
+            self.widget2.canvas.ax.set_ylabel('Relative percentage of reads', fontsize='large')
+            self.widget2.canvas.ax.set_xlabel('Nucleotide Position', fontsize='large')
+            self.widget2.canvas.ax.set_title(plotname[sub_select], fontsize='large')
             series1 = self.widget2.canvas.ax.scatter(data_dic['data1'][nucl_data[sub_select]], heights_1, alpha=0.5, facecolors=data_dic['data1'][subunitc[sub_select]],
                                                      picker=True, marker = data_dic['data1']['symbol'], label=' '.join(proc1), linewidth='1')
             series2 = self.widget2.canvas.ax.scatter(data_dic['data1'][nucl_data[sub_select]], heights_2, alpha=0.5, facecolors=data_dic['data2'][subunitc[sub_select]],
                                                      picker=True, marker = data_dic['data2']['symbol'], label=' '.join(proc2), linewidth='1')
             self.widget2.canvas.ax.set_ylim(-20,max(heights_1 + heights_2) + 10)
-            mazf = self.widget2.canvas.ax.scatter(0,-1000, alpha=0.5, c='red', marker = 'o', label = 'MazF')
-            mqsr = self.widget2.canvas.ax.scatter(0,-1000, alpha=0.5, c='cyan', marker = 'o', label = 'MqsR')
+            mazf = self.widget2.canvas.ax.scatter(0,-1000, alpha=0.5, c='red', marker = 'o', label = ' _ACA')
+            mqsr = self.widget2.canvas.ax.scatter(0,-1000, alpha=0.5, c='cyan', marker = 'o', label = 'G_CB')
             self.widget2.canvas.ax.legend(handles=[series1, series2, mazf, mqsr],loc='best', scatterpoints = 1)
+
             self.widget2.canvas.draw()
 
         elif value_select == 1:
             self.widget2.canvas.ax.clear()
-            self.widget2.canvas.ax.set_ylabel('Read Counts', fontsize=14)
-            self.widget2.canvas.ax.set_xlabel('Nucleotide Position', fontsize=14)
-            self.widget2.canvas.ax.set_title(plotname[sub_select], fontsize=14)
+            self.widget2.canvas.ax.set_ylabel('Read Counts', fontsize='large')
+            self.widget2.canvas.ax.set_xlabel('Nucleotide Position', fontsize='large')
+            self.widget2.canvas.ax.set_title(plotname[sub_select], fontsize='large')
             series1 = self.widget2.canvas.ax.scatter(data_dic['data1'][nucl_data[sub_select]], data_dic['data1'][subunit[sub_select]], alpha=0.5, c=data_dic['data1'][subunitc[sub_select]],
                                                      picker=True, marker = data_dic['data1']['symbol'], label=' '.join(proc1))
             self.widget2.canvas.ax.scatter(data_dic['data1'][nucl_data[sub_select]], [-1 * data for data in data_dic['data1'][subunit_neg[sub_select ]]], alpha=0.5, c=data_dic['data1'][subunitc[sub_select]],
@@ -190,14 +217,14 @@ class Plotter(QtGui.QWidget):
             self.widget2.canvas.fig.tight_layout()
             max_height = max(data_dic['data1'][subunit[sub_select]] + data_dic['data2'][subunit[sub_select]])
             self.widget2.canvas.ax.set_ylim(-0.2*max_height,max_height)
-            mazf = self.widget2.canvas.ax.scatter(0,-0.3*max_height, alpha=0.5, c='red', marker = 'o', label = 'MazF')
-            mqsr = self.widget2.canvas.ax.scatter(0,-0.3*max_height, alpha=0.5, c='cyan', marker = 'o', label = 'MqsR')
+            mazf = self.widget2.canvas.ax.scatter(0,-0.3*max_height, alpha=0.5, c='red', marker = 'o', label = ' _ACA')
+            mqsr = self.widget2.canvas.ax.scatter(0,-0.3*max_height, alpha=0.5, c='cyan', marker = 'o', label = 'G_CB')
             self.widget2.canvas.ax.legend(handles=[series1, series2, mazf, mqsr],loc='best', scatterpoints = 1)
             self.widget2.canvas.draw()
 
+    #==========================================================================
+    # Change labels in cboxes requried for 3-prime and 5-prime
     def on_combo_prime_change(self, index):
-        self.valcombo.setEnabled(False)
-        self.valcombo.setCurrentIndex(1)
         text = self.primcombo.currentText()
         if text == '5prime':
             self.proc2combo.clear()
@@ -211,7 +238,8 @@ class Plotter(QtGui.QWidget):
             self.proc1combo.addItems(items3prime.split(','))
 
 
-
+    #======================================================
+    # Return information when datapoint is clicked
     def onpick(self, event):
 
         global data_dic
@@ -239,6 +267,7 @@ class Plotter(QtGui.QWidget):
             fasta = fasta.seq
             pass
 
+        # Relative ja absolute joonestamine. Value_select 0 - relative, 1 - absolute
         if value_select == 1:
             nucleotide_pos = np.take(data_dic['data1'][nucl_data[sub_select]], ind)
             sample_1_pos_read_count = np.take(data_dic['data1'][subunit[sub_select]], ind)
@@ -271,10 +300,27 @@ class Plotter(QtGui.QWidget):
 
             hundred_1 = 0
             hundred_2 = 0
-            for i in range(-19,22):
-                index = data_dic['data1'][nucl_data[sub_select]].index(float(i))
-                hundred_1 += data_dic['data1'][subunit[sub_select]][index]
-                hundred_2 += data_dic['data2'][subunit[sub_select]][index]
+            #===============================================================
+            # Selection of locations for 100% for 5-prim and 3-prim
+
+            if prim_select == '5prime':
+                if sub_select == 0:
+                    area=range(-6,7)
+                else:
+                    area=range(0,14)
+                for i in area:
+                    index = data_dic['data1'][nucl_data[sub_select]].index(float(i))
+                    hundred_1 += data_dic['data1'][subunit[sub_select]][index]
+                    hundred_2 += data_dic['data2'][subunit[sub_select]][index]
+            elif prim_select == '3prime':
+                if sub_select == 0:
+                    area=range(1541,1550)
+                else:
+                    area=range(2901,2906)
+                for i in area:
+                    index = data_dic['data1'][nucl_data[sub_select]].index(float(i))
+                    hundred_1 += data_dic['data1'][subunit[sub_select]][index]
+                    hundred_2 += data_dic['data2'][subunit[sub_select]][index]
             heights_1 = [(x / hundred_1 * 100) for x in data_dic['data1'][subunit[sub_select]]]
             heights_2 = [(x / hundred_2 * 100) for x in data_dic['data2'][subunit[sub_select]]]
             ind = event.ind
@@ -302,10 +348,16 @@ class Plotter(QtGui.QWidget):
                     else:
                         threeprimeside = fasta[position+1:position+4]
                     sequence = str(fasta[position-4:position-1]+ '_' + '<b>' + fasta[position-1] + '</b>' + '_' + fasta[position:position+3])
+                #===============================================
+                # This awkward piece of code effectively removes the position 0 from the sequence,
+                # as position 0 does not really exist in DNA.
+                reported_position = int(nucleotide_pos[array_ind])
+                if reported_position <= 0:
+                    reported_position -= 1
                 sequence = ("").join([x if x != 'T' else 'U'for x in sequence ])
                 message = "Primary sequence:<br>{7}<br>Nucleotide position: {0:,}<br>Percentages:<br>{3}: {1}<br>{4}:\
                             {2}<br>Absolute values:<br>{3}: {5:,}<br>{4}: {6:,}<br>=======================<br>"\
-                            .format(int(nucleotide_pos[array_ind]),
+                            .format(reported_position,
                                     round(sample_1_pos_read_count[array_ind],4),
                                     round(sample_2_pos_read_count[array_ind], 4),
                                     ' '.join(proc1), ' '.join(proc2),
