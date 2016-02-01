@@ -150,7 +150,7 @@ class Plotter(QtGui.QWidget):
         self.widget1.canvas.ax.clear()
         self.widget1.canvas.ax.set_ylabel('M', fontsize=20)
         self.widget1.canvas.ax.set_xlabel('A', fontsize=20)
-        series1 = self.widget1.canvas.ax.scatter(MA_X_16S, MA_Y_16S, alpha=0.5, c=colors, linewidths=( 0, 0, 0), picker=True, label='Datapoints')
+        ser1 = self.widget1.canvas.ax.scatter(MA_X_16S, MA_Y_16S, alpha=0.5, c=colors, linewidths=( 0, 0, 0), picker=True, label='Datapoints')
         self.widget1.canvas.ax.set_ylim(min(MA_Y_16S)-2,max(MA_Y_16S) + 2)
         mazf = self.widget1.canvas.ax.scatter(0,min(MA_Y_16S)-200, alpha=0.5, c='red', marker = 'o', label = ' _ACA')
         mqsr = self.widget1.canvas.ax.scatter(0,min(MA_Y_16S)-200, alpha=0.5, c='cyan', marker = 'o', label = 'G_CB')
@@ -190,9 +190,9 @@ class Plotter(QtGui.QWidget):
             self.widget2.canvas.ax.set_ylabel('Relative percentage of reads', fontsize='large')
             self.widget2.canvas.ax.set_xlabel('Nucleotide Position', fontsize='large')
             self.widget2.canvas.ax.set_title(plotname[sub_select], fontsize='large')
-            series1 = self.widget2.canvas.ax.scatter(data_dic['data1'][nucl_data[sub_select]], heights_1, alpha=0.5, facecolors=data_dic['data1'][subunitc[sub_select]],
+            ser1 = self.widget2.canvas.ax.scatter(data_dic['data1'][nucl_data[sub_select]], heights_1, alpha=0.5, facecolors=data_dic['data1'][subunitc[sub_select]],
                                                      picker=True, marker = data_dic['data1']['symbol'], label=' '.join(proc1), linewidth='1')
-            series2 = self.widget2.canvas.ax.scatter(data_dic['data1'][nucl_data[sub_select]], heights_2, alpha=0.5, facecolors=data_dic['data2'][subunitc[sub_select]],
+            ser2 = self.widget2.canvas.ax.scatter(data_dic['data1'][nucl_data[sub_select]], heights_2, alpha=0.5, facecolors=data_dic['data2'][subunitc[sub_select]],
                                                      picker=True, marker = data_dic['data2']['symbol'], label=' '.join(proc2), linewidth='1')
             self.widget2.canvas.ax.set_ylim(-20,max(heights_1 + heights_2) + 10)
             mazf = self.widget2.canvas.ax.scatter(0,-1000, alpha=0.5, c='red', marker = 'o', label = ' _ACA')
@@ -206,21 +206,21 @@ class Plotter(QtGui.QWidget):
             self.widget2.canvas.ax.set_ylabel('Read Counts', fontsize='large')
             self.widget2.canvas.ax.set_xlabel('Nucleotide Position', fontsize='large')
             self.widget2.canvas.ax.set_title(plotname[sub_select], fontsize='large')
-            series1 = self.widget2.canvas.ax.scatter(data_dic['data1'][nucl_data[sub_select]], data_dic['data1'][subunit[sub_select]], alpha=0.5, c=data_dic['data1'][subunitc[sub_select]],
+            ser1 = self.widget2.canvas.ax.scatter(data_dic['data1'][nucl_data[sub_select]], data_dic['data1'][subunit[sub_select]], alpha=0.5, c=data_dic['data1'][subunitc[sub_select]],
                                                      picker=True, marker = data_dic['data1']['symbol'], label=' '.join(proc1))
             self.widget2.canvas.ax.scatter(data_dic['data1'][nucl_data[sub_select]], [-1 * data for data in data_dic['data1'][subunit_neg[sub_select ]]], alpha=0.5, c=data_dic['data1'][subunitc[sub_select]],
                                                      picker=True, marker = data_dic['data1']['symbol'])
-            series2 = self.widget2.canvas.ax.scatter(data_dic['data2'][nucl_data[sub_select]], data_dic['data2'][subunit[sub_select]], alpha=0.5, c=data_dic['data2'][subunitc[sub_select]],
+            ser2 = self.widget2.canvas.ax.scatter(data_dic['data2'][nucl_data[sub_select]], data_dic['data2'][subunit[sub_select]], alpha=0.5, c=data_dic['data2'][subunitc[sub_select]],
                                                      picker=True, marker = data_dic['data2']['symbol'], label=' '.join(proc2))
             self.widget2.canvas.ax.scatter(data_dic['data2'][nucl_data[sub_select]], [-1 * data for data in data_dic['data2'][subunit_neg[sub_select ]]], alpha=0.5, c=data_dic['data2'][subunitc[sub_select]],
                                                      picker=True, marker = data_dic['data2']['symbol'])
             self.widget2.canvas.fig.tight_layout()
             max_height = max(data_dic['data1'][subunit[sub_select]] + data_dic['data2'][subunit[sub_select]])
             self.widget2.canvas.ax.set_ylim(-0.2*max_height,max_height)
-            mazf = self.widget2.canvas.ax.scatter(0,-0.3*max_height, alpha=0.5, c='red', marker = 'o', label = ' _ACA')
-            mqsr = self.widget2.canvas.ax.scatter(0,-0.3*max_height, alpha=0.5, c='cyan', marker = 'o', label = 'G_CB')
-            mazf = self.widget2.canvas.ax.scatter(0,-1000, alpha=0.5, c='red', marker = 'o', label = 'MazF')
-            mqsr = self.widget2.canvas.ax.scatter(0,-1000, alpha=0.5, c='cyan', marker = 'o', label = 'MqsR')
+            #mazf = self.widget2.canvas.ax.scatter(0,-0.3*max_height, alpha=0.5, c='red', marker = 'o', label = ' _ACA')
+            #mqsr = self.widget2.canvas.ax.scatter(0,-0.3*max_height, alpha=0.5, c='cyan', marker = 'o', label = 'G_CB')
+            mazf = self.widget2.canvas.ax.scatter(0,-1000, alpha=0.5, c='red', marker = 'o', label = ' _ACA')
+            mqsr = self.widget2.canvas.ax.scatter(0,-1000, alpha=0.5, c='cyan', marker = 'o', label = 'G_CB')
             self.widget2.canvas.ax.legend(handles=[ser1, ser2, mazf, mqsr],loc='best', scatterpoints = 1)
             self.widget2.canvas.draw()
 
@@ -282,19 +282,26 @@ class Plotter(QtGui.QWidget):
                     position = int(nucleotide_pos[array_ind]) + 114
                 else:
                     position = int(nucleotide_pos[array_ind]) + 19
-                
+
                 if prim_select == '5prime':
                     sequence = str(fasta[position-3:position]+ '_' + '<b>' + fasta[position] + '</b>' + fasta[position+1:position+4])
                 else:
                     sequence = str(fasta[position-3:position] + '<b>' + fasta[position] + '</b>' + '_' + fasta[position+1:position+4])
+
+                #===============================================
+                # This awkward piece of code effectively removes the position 0 from the sequence,
+                # as position 0 does not really exist in DNA.
+
+                reported_position = int(nucleotide_pos[array_ind])
+                if reported_position <= 0:
+                    reported_position -= 1
+
                 sequence = ("").join([x if x != 'T' else 'U'for x in sequence ])
-                message = "Primary sequence:<br>{7}<br>Nucleotide position: {0:,} <br>{5} '+' strand: {1:,}<br>{6} '+' strand {2:,}\
-                                <br>{5} '-' strand: {3:,}<br>{6} '-' strand {4:,}<br>=======================<br>"\
-                                .format(int(nucleotide_pos[array_ind]),
+                message = "Primary sequence:<br>{5}<br>Nucleotide position: {0:,} <br>{3} '+' strand: {1:,}<br>{4} '+' strand {2:,}\
+                                <br>=======================<br>"\
+                                .format(reported_position,
                                         sample_1_pos_read_count[array_ind],
                                         sample_2_pos_read_count[array_ind],
-                                        sample_1_neg_read_count[array_ind],
-                                        sample_2_neg_read_count[array_ind],
                                         ' '.join(proc1),
                                         ' '.join(proc2),
                                         sequence)
@@ -347,14 +354,16 @@ class Plotter(QtGui.QWidget):
                     sequence = str(fasta[position-3:position]+ '_' + '<b>' + fasta[position] + '</b>' + fasta[position+1:position+4])
                 else:
                     sequence = str(fasta[position-3:position] + '<b>' + fasta[position] + '</b>' + '_' + fasta[position+1:position+4])
+
                 #===============================================
                 # This awkward piece of code effectively removes the position 0 from the sequence,
                 # as position 0 does not really exist in DNA.
+
                 reported_position = int(nucleotide_pos[array_ind])
                 if reported_position <= 0:
                     reported_position -= 1
                 sequence = ("").join([x if x != 'T' else 'U'for x in sequence ])
-                message = "Primary sequence:<br>{7}<br>Nucleotide position: {0:,}<br>Percentages:<br>{3}: {1}<br>{4}:\
+                message = "Primary sequence:<br>{7}<br>Nucleotide position: {0:,}<br>Relative:<br>{3}: {1}<br>{4}:\
                             {2}<br>Absolute values:<br>{3}: {5:,}<br>{4}: {6:,}<br>=======================<br>"\
                             .format(reported_position,
                                     round(sample_1_pos_read_count[array_ind],4),
